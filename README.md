@@ -18,9 +18,11 @@
 
 1. 下载仓库，双击 `Configure.cmd`，填写门户、账号和密码。
 2. 后续双击 `Start.cmd` 自动登录；`Stop.cmd` 停止服务。
-3. `Logs.cmd` 查看状态，`Open-VNC.cmd` 打开桌面，`Manual-Login.cmd` 切换为手动登录。
+3. `Logs.cmd` 查看状态，`Manual-Login.cmd` 切换为手动登录；需要浏览器桌面时运行 `Open-VNC.cmd`，按需启动 VNC 网页服务。
 
 默认地址均为本机：SOCKS5 `127.0.0.1:1080`、HTTP `127.0.0.1:8888`、VNC `127.0.0.1:5901`。浏览器 VNC 使用 6080 / 6081。已有服务占用端口时，修改配置中的端口或先停止旧服务。
+
+默认只启动 VPN 容器，浏览器 VNC 不随 Docker 自动启动。VPN 内存上限为 896 MiB（0.875 GiB），不额外使用交换空间；不同门户需求有差异，可在 `compose.yaml` 中调整。
 
 ## 配置
 

@@ -2,6 +2,7 @@
 param(
     [switch]$Configure,
     [switch]$Manual,
+    [switch]$VncOnly,
     [switch]$PrepareOnly,
     [ValidateSet('Plaintext', 'Encrypted')][string]$StorageMode
 )
@@ -43,7 +44,7 @@ if ($PrepareOnly) { Write-Host 'Credential storage updated. Containers unchanged
 $portalUri = [Uri]$config.Portal
 if ($portalUri.Scheme -notin @('http','https') -or !$portalUri.Host -or $portalUri.UserInfo) { throw 'Provide a valid HTTP(S) portal URL without embedded credentials.' }
 if ($portalUri.Host -eq 'vpn.example.com') { throw 'Run Configure.cmd first to set your own portal and account.' }
-if (!$Manual -and (!$vpn -or !$config.Username -or $config.Username -eq 'your-username')) { throw 'Run Configure.cmd first to set your account and password.' }
+if (!$Manual -and !$VncOnly -and (!$vpn -or !$config.Username -or $config.Username -eq 'your-username')) { throw 'Run Configure.cmd first to set your account and password.' }
 $ports = @($config.SocksPort, $config.HttpPort, $config.VncPort, $config.WebPort, $config.WebsocketPort)
 foreach ($port in $ports) { if (($port -isnot [int] -and $port -isnot [long]) -or $port -lt 1024 -or $port -gt 65535) { throw 'Ports must be integers from 1024 to 65535.' } }
 if (@($ports | Select-Object -Unique).Count -ne 5) { throw 'Choose five different listening ports.' }
@@ -67,7 +68,8 @@ try {
         @{services=@{client=@{extra_hosts=@{$portalUri.DnsSafeHost=[string]$gateway}}}} | ConvertTo-Json -Depth 6 | Set-Content -Encoding UTF8 -LiteralPath $override
         $arguments += @('-f',$override)
     }
-    & docker @arguments up -d
+    if ($VncOnly) { & docker @arguments up -d --no-deps desktop }
+    else { & docker @arguments up -d client }
     if ($LASTEXITCODE -ne 0) { throw 'Docker Compose startup failed.' }
     Write-Host ('SOCKS5 127.0.0.1:' + $config.SocksPort + ' | HTTP 127.0.0.1:' + $config.HttpPort)
     Write-Host 'Containers started. Startup alone does not prove VPN connectivity; check logs and an authorized internal service.'
