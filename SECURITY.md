@@ -1,20 +1,6 @@
-# Reporting issues without leaking secrets
+# 安全说明
 
-Do not include credentials.json, generated gateway overrides, Docker inspect
-output, cookies, session files, private SSH keys, or unredacted logs in issues.
-DPAPI ciphertext also belongs to your private configuration; do not publish it.
-Use vpn.example.com, sample-user, and synthetic passwords in reproductions.
-
-Plaintext storage is an explicit convenience option, not protection against
-local readers. DPAPI protects saved values for the Windows account; Docker
-administrators can still inspect runtime credentials. All network listeners
-are bound to loopback by default. Browser VNC is for trusted local use only.
-
-The helper stops when credentials are rejected or a session is revoked. It
-does not attempt to bypass verification, device checks, or account lockouts.
-Confirm account status before restarting after an authentication rejection.
-
-For a non-sensitive implementation bug, open an issue with the image digest,
-Windows/Docker versions, selected storage mode, and a synthetic reproduction.
-For a vulnerability, use GitHub's private vulnerability reporting when enabled;
-do not disclose credentials or real institutional network details publicly.
+- 请勿在 Issue 中上传真实配置、Cookie、私钥、容器环境或未脱敏日志。
+- 明文存储不保护文件内容；DPAPI 保护本地存储，不能阻止 Docker 管理员读取运行中的凭据。
+- 代理与 VNC 默认仅监听本机。认证被拒后，请核对账户状态再重新启动。
+- 报告问题时提供版本信息和使用示例数据的复现步骤；安全漏洞请通过 GitHub 私密报告渠道提交。
