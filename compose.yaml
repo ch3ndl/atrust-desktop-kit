@@ -1,0 +1,36 @@
+name: atrust-desktop-kit
+services:
+  client:
+    image: kenvix/docker-atrust-autologin@sha256:e9bac40073f7e44f746f0df7588f1726a0238dad7efc49bddc98a417d19c715d
+    restart: unless-stopped
+    environment:
+      ATRUST_OPTS: ${ATRUST_OPTS:?Use Start-ATrust.ps1}
+      PASSWORD: ${ATRUST_VNC_PASSWORD:?Use Start-ATrust.ps1}
+      URLWIN: "1"
+    cap_add: [NET_ADMIN]
+    devices: [/dev/net/tun:/dev/net/tun]
+    volumes:
+      - client-data:/root
+      - ./runtime/launcher.py:/opt/atrust-autologin/launcher.py:ro
+      - ./runtime/helper.py:/opt/atrust-autologin/desktop_helper.py:ro
+    ports:
+      - "127.0.0.1:${SOCKS_PORT:-1080}:1080"
+      - "127.0.0.1:${HTTP_PORT:-8888}:8888"
+      - "127.0.0.1:${VNC_PORT:-5901}:5901"
+    sysctls:
+      net.ipv4.conf.default.route_localnet: "1"
+    shm_size: 256m
+    logging: &logging
+      driver: local
+      options: {max-size: 10m, max-file: "3"}
+  desktop:
+    image: kenvix/docker-atrust-autologin@sha256:e9bac40073f7e44f746f0df7588f1726a0238dad7efc49bddc98a417d19c715d
+    restart: unless-stopped
+    entrypoint: [/bin/sh, -c]
+    command: ["python3 -m http.server 6080 --directory /usr/local/share/novnc & exec /usr/local/bin/websockify 6081 client:5901"]
+    ports:
+      - "127.0.0.1:${WEB_PORT:-6080}:6080"
+      - "127.0.0.1:${WEBSOCKET_PORT:-6081}:6081"
+    logging: *logging
+volumes:
+  client-data:

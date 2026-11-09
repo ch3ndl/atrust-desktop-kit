@@ -1,0 +1,19 @@
+# Local credentials, authentication state, and generated overrides must stay local.
+credentials.json
+credentials.*.json
+!credentials.example.json
+.env
+.env.*
+compose.gateway.yaml
+data/
+backups/
+*.pkl
+*.log
+*.key
+*.pem
+*.pfx
+*.bak
+__pycache__/
+*.pyc
+.venv/
+.DS_Store
