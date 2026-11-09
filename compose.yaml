@@ -3,9 +3,9 @@ services:
   client:
     image: kenvix/docker-atrust-autologin@sha256:e9bac40073f7e44f746f0df7588f1726a0238dad7efc49bddc98a417d19c715d
     restart: unless-stopped
-    mem_limit: 896m
-    mem_reservation: 768m
-    memswap_limit: 896m
+    mem_limit: 768m
+    mem_reservation: 640m
+    memswap_limit: 768m
     environment:
       ATRUST_OPTS: ${ATRUST_OPTS:?Use Start-ATrust.ps1}
       PASSWORD: ${ATRUST_VNC_PASSWORD:?Use Start-ATrust.ps1}
